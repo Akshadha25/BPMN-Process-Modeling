@@ -70,10 +70,9 @@ The BPMN models were created and tested using **Camunda Modeler**.
 
 ## Verification
 
-The BPMN models were checked to ensure that they contain the required BPMN elements, including start events, tasks, exclusive gateways, alternative paths, sequence flows, and end events.
+All three BPMN models were opened and checked in Camunda Modeler. The diagrams were verified to contain the required start events, tasks, exclusive gateways, alternative paths, sequence flows, and end events.
 
-Token Simulation can be used in Camunda Modeler to demonstrate the different alternative paths in each process.
-
+The models were also tested using Token Simulation to check the different alternative paths in each process.
 ## Repository Structure
 
 ```text
