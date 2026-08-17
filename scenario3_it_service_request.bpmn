@@ -8,30 +8,30 @@
   <bpmn:process id="Process_ITServiceRequest" name="IT Service Request Handling" isExecutable="false">
     <bpmn:startEvent id="Start_1" name="Employee reports
 IT problem"><bpmn:outgoing>Flow_1</bpmn:outgoing></bpmn:startEvent>
-    <bpmn:task id="Task_Submit" name="Submit IT support
-request"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_Register" name="Register the
-request"><bpmn:incoming>Flow_2</bpmn:incoming><bpmn:outgoing>Flow_3</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_CheckSeverity" name="Check severity
-of problem"><bpmn:incoming>Flow_3</bpmn:incoming><bpmn:outgoing>Flow_4</bpmn:outgoing></bpmn:task>
+    <bpmn:userTask id="Task_Submit" name="Submit IT support
+request"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing></bpmn:userTask>
+    <bpmn:userTask id="Task_Register" name="Register the
+request"><bpmn:incoming>Flow_2</bpmn:incoming><bpmn:outgoing>Flow_3</bpmn:outgoing></bpmn:userTask>
+    <bpmn:userTask id="Task_CheckSeverity" name="Check severity
+of problem"><bpmn:incoming>Flow_3</bpmn:incoming><bpmn:outgoing>Flow_4</bpmn:outgoing></bpmn:userTask>
     <bpmn:exclusiveGateway id="GW_Severity" name="Severity
 level?"><bpmn:incoming>Flow_4</bpmn:incoming><bpmn:outgoing>Flow_5</bpmn:outgoing><bpmn:outgoing>Flow_6</bpmn:outgoing></bpmn:exclusiveGateway>
-    <bpmn:task id="Task_AssignSupport" name="Assign to support
-technician"><bpmn:incoming>Flow_5</bpmn:incoming><bpmn:outgoing>Flow_7</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_AssignSenior" name="Assign to senior
-technician"><bpmn:incoming>Flow_6</bpmn:incoming><bpmn:outgoing>Flow_8</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_Investigate" name="Investigate the
-problem"><bpmn:incoming>Flow_7</bpmn:incoming><bpmn:incoming>Flow_8</bpmn:incoming><bpmn:outgoing>Flow_9</bpmn:outgoing></bpmn:task>
+    <bpmn:userTask id="Task_AssignSupport" name="Assign to support
+technician"><bpmn:incoming>Flow_5</bpmn:incoming><bpmn:outgoing>Flow_7</bpmn:outgoing></bpmn:userTask>
+    <bpmn:userTask id="Task_AssignSenior" name="Assign to senior
+technician"><bpmn:incoming>Flow_6</bpmn:incoming><bpmn:outgoing>Flow_8</bpmn:outgoing></bpmn:userTask>
+    <bpmn:userTask id="Task_Investigate" name="Investigate the
+problem"><bpmn:incoming>Flow_7</bpmn:incoming><bpmn:incoming>Flow_8</bpmn:incoming><bpmn:outgoing>Flow_9</bpmn:outgoing></bpmn:userTask>
     <bpmn:exclusiveGateway id="GW_Resolvable" name="Resolvable
 internally?"><bpmn:incoming>Flow_9</bpmn:incoming><bpmn:outgoing>Flow_10</bpmn:outgoing><bpmn:outgoing>Flow_11</bpmn:outgoing></bpmn:exclusiveGateway>
-    <bpmn:task id="Task_Fix" name="Fix the
-problem"><bpmn:incoming>Flow_10</bpmn:incoming><bpmn:outgoing>Flow_12</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_Escalate" name="Escalate to external
-service provider"><bpmn:incoming>Flow_11</bpmn:incoming><bpmn:outgoing>Flow_13</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_UpdateStatus" name="Update request
-status"><bpmn:incoming>Flow_12</bpmn:incoming><bpmn:incoming>Flow_13</bpmn:incoming><bpmn:outgoing>Flow_14</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_NotifyEmployee" name="Notify employee
-of resolution"><bpmn:incoming>Flow_14</bpmn:incoming><bpmn:outgoing>Flow_15</bpmn:outgoing></bpmn:task>
+    <bpmn:userTask id="Task_Fix" name="Fix the
+problem"><bpmn:incoming>Flow_10</bpmn:incoming><bpmn:outgoing>Flow_12</bpmn:outgoing></bpmn:userTask>
+    <bpmn:sendTask id="Task_Escalate" name="Escalate to external
+service provider"><bpmn:incoming>Flow_11</bpmn:incoming><bpmn:outgoing>Flow_13</bpmn:outgoing></bpmn:sendTask>
+    <bpmn:userTask id="Task_UpdateStatus" name="Update request
+status"><bpmn:incoming>Flow_12</bpmn:incoming><bpmn:incoming>Flow_13</bpmn:incoming><bpmn:outgoing>Flow_14</bpmn:outgoing></bpmn:userTask>
+    <bpmn:sendTask id="Task_NotifyEmployee" name="Notify employee
+of resolution"><bpmn:incoming>Flow_14</bpmn:incoming><bpmn:outgoing>Flow_15</bpmn:outgoing></bpmn:sendTask>
     <bpmn:endEvent id="End_1" name="Process ends"><bpmn:incoming>Flow_15</bpmn:incoming></bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_1" targetRef="Task_Submit" />
     <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Submit" targetRef="Task_Register" />
