@@ -8,28 +8,28 @@
   <bpmn:process id="Process_PurchaseOrder" name="Online Purchase Order Processing" isExecutable="false">
     <bpmn:startEvent id="Start_1" name="Customer
 places order"><bpmn:outgoing>Flow_1</bpmn:outgoing></bpmn:startEvent>
-    <bpmn:task id="Task_CheckAvail" name="Check product
-availability"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing></bpmn:task>
+    <bpmn:serviceTask id="Task_CheckAvail" name="Check product
+availability"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing></bpmn:serviceTask>
     <bpmn:exclusiveGateway id="GW_Available" name="Product
 available?"><bpmn:incoming>Flow_2</bpmn:incoming><bpmn:outgoing>Flow_3</bpmn:outgoing><bpmn:outgoing>Flow_4</bpmn:outgoing></bpmn:exclusiveGateway>
-    <bpmn:task id="Task_NotifyOOS" name="Notify customer:
-out of stock"><bpmn:incoming>Flow_3</bpmn:incoming><bpmn:outgoing>Flow_5</bpmn:outgoing></bpmn:task>
+    <bpmn:sendTask id="Task_NotifyOOS" name="Notify customer:
+out of stock"><bpmn:incoming>Flow_3</bpmn:incoming><bpmn:outgoing>Flow_5</bpmn:outgoing></bpmn:sendTask>
     <bpmn:endEvent id="End_OOS" name="Order cancelled
 (out of stock)"><bpmn:incoming>Flow_5</bpmn:incoming></bpmn:endEvent>
-    <bpmn:task id="Task_ProcessPayment" name="Process
-payment"><bpmn:incoming>Flow_4</bpmn:incoming><bpmn:outgoing>Flow_6</bpmn:outgoing></bpmn:task>
+    <bpmn:serviceTask id="Task_ProcessPayment" name="Process
+payment"><bpmn:incoming>Flow_4</bpmn:incoming><bpmn:outgoing>Flow_6</bpmn:outgoing></bpmn:serviceTask>
     <bpmn:exclusiveGateway id="GW_PaymentOK" name="Payment
 successful?"><bpmn:incoming>Flow_6</bpmn:incoming><bpmn:outgoing>Flow_7</bpmn:outgoing><bpmn:outgoing>Flow_8</bpmn:outgoing></bpmn:exclusiveGateway>
-    <bpmn:task id="Task_NotifyPayFail" name="Notify customer:
-payment failed"><bpmn:incoming>Flow_7</bpmn:incoming><bpmn:outgoing>Flow_9</bpmn:outgoing></bpmn:task>
+    <bpmn:sendTask id="Task_NotifyPayFail" name="Notify customer:
+payment failed"><bpmn:incoming>Flow_7</bpmn:incoming><bpmn:outgoing>Flow_9</bpmn:outgoing></bpmn:sendTask>
     <bpmn:endEvent id="End_PayFail" name="Order cancelled
 (payment failed)"><bpmn:incoming>Flow_9</bpmn:incoming></bpmn:endEvent>
-    <bpmn:task id="Task_ConfirmOrder" name="Confirm order"><bpmn:incoming>Flow_8</bpmn:incoming><bpmn:outgoing>Flow_10</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_PrepareShipment" name="Prepare product
-for shipment"><bpmn:incoming>Flow_10</bpmn:incoming><bpmn:outgoing>Flow_11</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_ShipOrder" name="Ship order"><bpmn:incoming>Flow_11</bpmn:incoming><bpmn:outgoing>Flow_12</bpmn:outgoing></bpmn:task>
-    <bpmn:task id="Task_SendShipConfirm" name="Send shipping
-confirmation"><bpmn:incoming>Flow_12</bpmn:incoming><bpmn:outgoing>Flow_13</bpmn:outgoing></bpmn:task>
+    <bpmn:serviceTask id="Task_ConfirmOrder" name="Confirm order"><bpmn:incoming>Flow_8</bpmn:incoming><bpmn:outgoing>Flow_10</bpmn:outgoing></bpmn:serviceTask>
+    <bpmn:manualTask id="Task_PrepareShipment" name="Prepare product
+for shipment"><bpmn:incoming>Flow_10</bpmn:incoming><bpmn:outgoing>Flow_11</bpmn:outgoing></bpmn:manualTask>
+    <bpmn:manualTask id="Task_ShipOrder" name="Ship order"><bpmn:incoming>Flow_11</bpmn:incoming><bpmn:outgoing>Flow_12</bpmn:outgoing></bpmn:manualTask>
+    <bpmn:sendTask id="Task_SendShipConfirm" name="Send shipping
+confirmation"><bpmn:incoming>Flow_12</bpmn:incoming><bpmn:outgoing>Flow_13</bpmn:outgoing></bpmn:sendTask>
     <bpmn:endEvent id="End_Completed" name="Order completed"><bpmn:incoming>Flow_13</bpmn:incoming></bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_1" targetRef="Task_CheckAvail" />
     <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_CheckAvail" targetRef="GW_Available" />
