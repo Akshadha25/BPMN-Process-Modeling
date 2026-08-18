@@ -67,14 +67,3 @@ The BPMN models were created using **Camunda Modeler**.
 The BPMN models were opened and checked in Camunda Modeler to ensure that the processes, sequence flows, gateways, alternative paths, and end events were present and readable.
 
 The models were also tested using Token Simulation to check the different alternative paths in the processes.
-
-## Repository Structure
-
-```text
-BPMN-Process-Modeling/
-│
-├── README.md
-├── BPMN_Explanation_Report.pdf
-├── scenario1_leave_approval.bpmn
-├── scenario2_purchase_order.bpmn
-└── scenario3_it_service_request.bpmn
