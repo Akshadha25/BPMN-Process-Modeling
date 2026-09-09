@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20191111/DC/"
+             id="Definitions_LeaveApprovalDecision"
+             name="Leave Approval Decision"
+             namespace="http://camunda.org/schema/1.0/dmn"
+             exporter="Claude" exporterVersion="1.0">
+
+  <decision id="leaveApprovalDecision" name="Leave Approval Decision">
+    <decisionTable id="DecisionTable_1" hitPolicy="FIRST">
+
+      <input id="Input_BalanceCheck" label="Balance Check">
+        <inputExpression id="InputExpression_BalanceCheck" typeRef="boolean">
+          <text>requestedDays &lt;= availableBalance</text>
+        </inputExpression>
+      </input>
+
+      <input id="Input_LeaveType" label="Leave Type">
+        <inputExpression id="InputExpression_LeaveType" typeRef="string">
+          <text>leaveType</text>
+        </inputExpression>
+      </input>
+
+      <input id="Input_RequestedDays" label="Requested Days">
+        <inputExpression id="InputExpression_RequestedDays" typeRef="number">
+          <text>requestedDays</text>
+        </inputExpression>
+      </input>
+
+      <output id="Output_Decision" label="Decision" name="decision" typeRef="string" />
+
+      <!-- RULE 1: insufficient balance overrides everything else (FIRST hit policy,
+           so this rule MUST be evaluated first) -->
+      <rule id="Rule_1">
+        <inputEntry id="Rule_1_In1"><text>false</text></inputEntry>
+        <inputEntry id="Rule_1_In2"><text>-</text></inputEntry>
+        <inputEntry id="Rule_1_In3"><text>-</text></inputEntry>
+        <outputEntry id="Rule_1_Out1"><text>"INSUFFICIENT_BALANCE"</text></outputEntry>
+      </rule>
+
+      <!-- RULE 2: sick leave, 3 days or fewer, sufficient balance -> auto approve -->
+      <rule id="Rule_2">
+        <inputEntry id="Rule_2_In1"><text>true</text></inputEntry>
+        <inputEntry id="Rule_2_In2"><text>"Sick"</text></inputEntry>
+        <inputEntry id="Rule_2_In3"><text>&lt;= 3</text></inputEntry>
+        <outputEntry id="Rule_2_Out1"><text>"AUTO_APPROVED"</text></outputEntry>
+      </rule>
+
+      <!-- RULE 3: casual leave -> always manager review -->
+      <rule id="Rule_3">
+        <inputEntry id="Rule_3_In1"><text>true</text></inputEntry>
+        <inputEntry id="Rule_3_In2"><text>"Casual"</text></inputEntry>
+        <inputEntry id="Rule_3_In3"><text>-</text></inputEntry>
+        <outputEntry id="Rule_3_Out1"><text>"MANAGER_REVIEW"</text></outputEntry>
+      </rule>
+
+      <!-- RULE 4: earned leave -> always manager review -->
+      <rule id="Rule_4">
+        <inputEntry id="Rule_4_In1"><text>true</text></inputEntry>
+        <inputEntry id="Rule_4_In2"><text>"Earned"</text></inputEntry>
+        <inputEntry id="Rule_4_In3"><text>-</text></inputEntry>
+        <outputEntry id="Rule_4_Out1"><text>"MANAGER_REVIEW"</text></outputEntry>
+      </rule>
+
+      <!-- RULE 5: sick leave, more than 3 days -> manager review -->
+      <rule id="Rule_5">
+        <inputEntry id="Rule_5_In1"><text>true</text></inputEntry>
+        <inputEntry id="Rule_5_In2"><text>"Sick"</text></inputEntry>
+        <inputEntry id="Rule_5_In3"><text>&gt; 3</text></inputEntry>
+        <outputEntry id="Rule_5_Out1"><text>"MANAGER_REVIEW"</text></outputEntry>
+      </rule>
+
+    </decisionTable>
+  </decision>
+
+</definitions>
