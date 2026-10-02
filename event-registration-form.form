@@ -1,0 +1,78 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "text": "# Event Registration\nPlease fill in your details to reserve a seat. All fields are required.",
+      "layout": { "row": "Row_header", "columns": null },
+      "id": "Field_Header"
+    },
+    {
+      "label": "Full Name",
+      "type": "textfield",
+      "layout": { "row": "Row_identity", "columns": 8 },
+      "id": "Field_FullName",
+      "key": "fullName",
+      "validate": { "required": true }
+    },
+    {
+      "label": "Email Address",
+      "type": "textfield",
+      "layout": { "row": "Row_identity", "columns": 8 },
+      "id": "Field_Email",
+      "key": "email",
+      "validate": { "required": true, "validationType": "email" }
+    },
+    {
+      "label": "Event Date",
+      "type": "datetime",
+      "subtype": "date",
+      "dateLabel": "Event Date",
+      "layout": { "row": "Row_event", "columns": 8 },
+      "id": "Field_EventDate",
+      "key": "eventDate",
+      "validate": { "required": true }
+    },
+    {
+      "label": "Registration Category",
+      "type": "select",
+      "values": [
+        { "label": "Student", "value": "Student" },
+        { "label": "Professional", "value": "Professional" },
+        { "label": "Guest", "value": "Guest" }
+      ],
+      "layout": { "row": "Row_event", "columns": 8 },
+      "id": "Field_Category",
+      "key": "category",
+      "validate": { "required": true }
+    },
+    {
+      "label": "Reason for Attending",
+      "type": "textarea",
+      "description": "Tell us briefly why you'd like to attend this event.",
+      "layout": { "row": "Row_reason", "columns": null },
+      "id": "Field_Reason",
+      "key": "reason",
+      "validate": { "required": true, "minLength": 10 }
+    },
+    {
+      "label": "I agree to the event terms and conditions",
+      "type": "checkbox",
+      "layout": { "row": "Row_terms", "columns": null },
+      "id": "Field_AgreeTerms",
+      "key": "agreeTerms",
+      "validate": { "required": true }
+    },
+    {
+      "label": "Submit Registration",
+      "type": "button",
+      "action": "submit",
+      "layout": { "row": "Row_submit", "columns": null },
+      "id": "Field_Submit"
+    }
+  ],
+  "type": "default",
+  "id": "event_registration_form",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "schemaVersion": 18
+}
