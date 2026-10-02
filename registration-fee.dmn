@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             id="Definitions_RegistrationFee"
+             name="Registration Fee"
+             namespace="http://camunda.org/schema/1.0/dmn"
+             exporter="Camunda Modeler"
+             exporterVersion="5.x">
+
+  <decision id="registrationFee" name="Determine Registration Fee">
+    <variable id="registrationFee_var" name="fee" typeRef="number" />
+    <decisionTable id="DecisionTable_Fee" hitPolicy="UNIQUE">
+      <input id="Input_Category" label="Registration Category">
+        <inputExpression id="InputExpr_Category" typeRef="string">
+          <text>category</text>
+        </inputExpression>
+      </input>
+      <output id="Output_Fee" label="Fee" name="fee" typeRef="number" />
+
+      <rule id="FeeRule_1">
+        <inputEntry id="FeeRule_1_In1"><text>"Student"</text></inputEntry>
+        <outputEntry id="FeeRule_1_Out1"><text>10</text></outputEntry>
+      </rule>
+      <rule id="FeeRule_2">
+        <inputEntry id="FeeRule_2_In1"><text>"Professional"</text></inputEntry>
+        <outputEntry id="FeeRule_2_Out1"><text>50</text></outputEntry>
+      </rule>
+      <rule id="FeeRule_3">
+        <inputEntry id="FeeRule_3_In1"><text>"Guest"</text></inputEntry>
+        <outputEntry id="FeeRule_3_Out1"><text>25</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_1">
+      <dmndi:DMNShape id="DMNShape_registrationFee" dmnElementRef="registrationFee">
+        <dc:Bounds height="80" width="180" x="160" y="160" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+
+</definitions>

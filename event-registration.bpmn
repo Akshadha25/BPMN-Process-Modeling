@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  xmlns:modeler="http://camunda.org/schema/modeler/1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_EventRegistration"
+                  targetNamespace="http://camunda.org/schema/1.0/bpmn"
+                  exporter="Camunda Modeler"
+                  exporterVersion="5.x"
+                  modeler:executionPlatform="Camunda Cloud"
+                  modeler:executionPlatformVersion="8.8.0">
+
+  <bpmn:process id="Process_EventRegistration" name="Event Registration" isExecutable="true">
+
+    <!-- ================= START ================= -->
+    <bpmn:startEvent id="StartEvent_1" name="Event Registration Started">
+      <bpmn:outgoing>Flow_Start_Register</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- ================= FILL REGISTRATION FORM (User Task) ================= -->
+    <bpmn:userTask id="Task_FillForm" name="Fill Registration Form">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="event_registration_form" bindingType="latest" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Start_Register</bpmn:incoming>
+      <bpmn:outgoing>Flow_Register_CheckSeats</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- ================= CHECK SEAT AVAILABILITY (Service Task) ================= -->
+    <bpmn:serviceTask id="Task_CheckSeats" name="Check Seat Availability">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="check-seat-availability" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="= eventDate" target="eventDate" />
+          <zeebe:output source="= seatsAvailable" target="seatsAvailable" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Register_CheckSeats</bpmn:incoming>
+      <bpmn:outgoing>Flow_CheckSeats_Gateway</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- ================= GATEWAY ================= -->
+    <bpmn:exclusiveGateway id="GW_SeatsAvailable" name="Seats Available?" default="Flow_Gateway_NotifyFull">
+      <bpmn:incoming>Flow_CheckSeats_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Gateway_NotifyFull</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Gateway_DetermineFee</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- ================= NOTIFY: EVENT FULL (Service Task) ================= -->
+    <bpmn:serviceTask id="Task_NotifyFull" name="Notify: Event Full">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="notify-registrant" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="= email" target="email" />
+          <zeebe:input source="=&#34;EVENT_FULL&#34;" target="notificationType" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Gateway_NotifyFull</bpmn:incoming>
+      <bpmn:outgoing>Flow_NotifyFull_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_Rejected" name="Registration Rejected: Event Full">
+      <bpmn:incoming>Flow_NotifyFull_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ================= DETERMINE REGISTRATION FEE (Business Rule Task) ================= -->
+    <bpmn:businessRuleTask id="Task_DetermineFee" name="Determine Registration Fee">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="registrationFee" resultVariable="fee" bindingType="latest" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Gateway_DetermineFee</bpmn:incoming>
+      <bpmn:outgoing>Flow_DetermineFee_Confirm</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+
+    <!-- ================= CONFIRM REGISTRATION (Service Task) ================= -->
+    <bpmn:serviceTask id="Task_ConfirmRegistration" name="Confirm Registration">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="confirm-registration" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="= fullName" target="fullName" />
+          <zeebe:input source="= fee" target="fee" />
+          <zeebe:output source="= confirmationNumber" target="confirmationNumber" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_DetermineFee_Confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_Confirm_PrintBadge</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- ================= PRINT VISITOR BADGE (Manual Task) ================= -->
+    <bpmn:manualTask id="Task_PrintBadge" name="Print Visitor Badge">
+      <bpmn:incoming>Flow_Confirm_PrintBadge</bpmn:incoming>
+      <bpmn:outgoing>Flow_PrintBadge_SendEmail</bpmn:outgoing>
+    </bpmn:manualTask>
+
+    <!-- ================= SEND CONFIRMATION EMAIL (Send Task) ================= -->
+    <bpmn:sendTask id="Task_SendEmail" name="Send Confirmation Email">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-confirmation-email" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="= email" target="email" />
+          <zeebe:input source="= confirmationNumber" target="confirmationNumber" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_PrintBadge_SendEmail</bpmn:incoming>
+      <bpmn:outgoing>Flow_SendEmail_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_Confirmed" name="Registration Confirmed">
+      <bpmn:incoming>Flow_SendEmail_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ================= SEQUENCE FLOWS ================= -->
+    <bpmn:sequenceFlow id="Flow_Start_Register" sourceRef="StartEvent_1" targetRef="Task_FillForm" />
+    <bpmn:sequenceFlow id="Flow_Register_CheckSeats" sourceRef="Task_FillForm" targetRef="Task_CheckSeats" />
+    <bpmn:sequenceFlow id="Flow_CheckSeats_Gateway" sourceRef="Task_CheckSeats" targetRef="GW_SeatsAvailable" />
+
+    <bpmn:sequenceFlow id="Flow_Gateway_NotifyFull" name="NO" sourceRef="GW_SeatsAvailable" targetRef="Task_NotifyFull"></bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_Gateway_DetermineFee" name="YES" sourceRef="GW_SeatsAvailable" targetRef="Task_DetermineFee">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=seatsAvailable = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_NotifyFull_End" sourceRef="Task_NotifyFull" targetRef="End_Rejected" />
+    <bpmn:sequenceFlow id="Flow_DetermineFee_Confirm" sourceRef="Task_DetermineFee" targetRef="Task_ConfirmRegistration" />
+    <bpmn:sequenceFlow id="Flow_Confirm_PrintBadge" sourceRef="Task_ConfirmRegistration" targetRef="Task_PrintBadge" />
+    <bpmn:sequenceFlow id="Flow_PrintBadge_SendEmail" sourceRef="Task_PrintBadge" targetRef="Task_SendEmail" />
+    <bpmn:sequenceFlow id="Flow_SendEmail_End" sourceRef="Task_SendEmail" targetRef="End_Confirmed" />
+
+  </bpmn:process>
+
+  <!-- ================= DIAGRAM (DI) ================= -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_EventRegistration">
+
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="130" y="325" width="80" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_FillForm_di" bpmnElement="Task_FillForm">
+        <dc:Bounds x="240" y="260" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CheckSeats_di" bpmnElement="Task_CheckSeats">
+        <dc:Bounds x="420" y="260" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW_SeatsAvailable_di" bpmnElement="GW_SeatsAvailable" isMarkerVisible="true">
+        <dc:Bounds x="600" y="275" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="585" y="238" width="80" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_NotifyFull_di" bpmnElement="Task_NotifyFull">
+        <dc:Bounds x="700" y="420" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Rejected_di" bpmnElement="End_Rejected">
+        <dc:Bounds x="882" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="855" y="485" width="90" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_DetermineFee_di" bpmnElement="Task_DetermineFee">
+        <dc:Bounds x="700" y="260" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_ConfirmRegistration_di" bpmnElement="Task_ConfirmRegistration">
+        <dc:Bounds x="880" y="260" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_PrintBadge_di" bpmnElement="Task_PrintBadge">
+        <dc:Bounds x="1060" y="260" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SendEmail_di" bpmnElement="Task_SendEmail">
+        <dc:Bounds x="1240" y="260" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Confirmed_di" bpmnElement="End_Confirmed">
+        <dc:Bounds x="1420" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1395" y="325" width="86" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- edges -->
+      <bpmndi:BPMNEdge id="Flow_Start_Register_di" bpmnElement="Flow_Start_Register">
+        <di:waypoint x="188" y="300" />
+        <di:waypoint x="240" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Register_CheckSeats_di" bpmnElement="Flow_Register_CheckSeats">
+        <di:waypoint x="370" y="300" />
+        <di:waypoint x="420" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_CheckSeats_Gateway_di" bpmnElement="Flow_CheckSeats_Gateway">
+        <di:waypoint x="550" y="300" />
+        <di:waypoint x="600" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Gateway_NotifyFull_di" bpmnElement="Flow_Gateway_NotifyFull">
+        <di:waypoint x="625" y="325" />
+        <di:waypoint x="625" y="460" />
+        <di:waypoint x="700" y="460" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Gateway_DetermineFee_di" bpmnElement="Flow_Gateway_DetermineFee">
+        <di:waypoint x="650" y="300" />
+        <di:waypoint x="700" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_NotifyFull_End_di" bpmnElement="Flow_NotifyFull_End">
+        <di:waypoint x="830" y="460" />
+        <di:waypoint x="882" y="460" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_DetermineFee_Confirm_di" bpmnElement="Flow_DetermineFee_Confirm">
+        <di:waypoint x="830" y="300" />
+        <di:waypoint x="880" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Confirm_PrintBadge_di" bpmnElement="Flow_Confirm_PrintBadge">
+        <di:waypoint x="1010" y="300" />
+        <di:waypoint x="1060" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_PrintBadge_SendEmail_di" bpmnElement="Flow_PrintBadge_SendEmail">
+        <di:waypoint x="1190" y="300" />
+        <di:waypoint x="1240" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_SendEmail_End_di" bpmnElement="Flow_SendEmail_End">
+        <di:waypoint x="1370" y="300" />
+        <di:waypoint x="1420" y="300" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
