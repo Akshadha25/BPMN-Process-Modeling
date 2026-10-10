@@ -1,0 +1,14 @@
+# Paste the four values from Console -> cluster -> API -> your client (Spring Boot tab).
+# Better: set them as environment variables so no secret is ever committed to Git.
+camunda:
+  client:
+    mode: saas
+    auth:
+      client-id: ${CAMUNDA_CLIENT_ID:your-client-id}
+      client-secret: ${CAMUNDA_CLIENT_SECRET:your-client-secret}
+    cloud:
+      cluster-id: ${CAMUNDA_CLUSTER_ID:your-cluster-id}
+      region: ${CAMUNDA_CLUSTER_REGION:your-region}   # e.g. bru-2
+
+server:
+  port: 8080
