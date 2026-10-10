@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "Ex 6 - Start a Camunda 8 Process via REST",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "processInstanceKey",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Start instance (leave-request)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v2/process-instances",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v2",
+            "process-instances"
+          ]
+        },
+        "description": "Main request of the exercise. Screenshot the request AND the response (note processInstanceKey).",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"processDefinitionId\": \"leave-request\",\n  \"variables\": {\n    \"employeeName\": \"Ravi\",\n    \"days\": 3\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('instance created (200)', function () { pm.response.to.have.status(200); });",
+              "var body = pm.response.json();",
+              "pm.collectionVariables.set('processInstanceKey', body.processInstanceKey);",
+              "pm.test('response has processInstanceKey', function () { pm.expect(body.processInstanceKey).to.exist; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Viva Q2 - wrong Process ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v2/process-instances",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v2",
+            "process-instances"
+          ]
+        },
+        "description": "Misspelled Process ID. Expect HTTP 404 NOT_FOUND ('Expected to find process definition with process ID ... but none found').",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"processDefinitionId\": \"leave-reqest\",\n  \"variables\": {\n    \"employeeName\": \"Ravi\",\n    \"days\": 3\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('wrong id is rejected (404)', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
