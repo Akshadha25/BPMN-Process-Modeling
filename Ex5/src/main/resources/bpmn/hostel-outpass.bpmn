@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  id="Definitions_HostelOutpass"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="Camunda Modeler"
+                  exporterVersion="5.x">
+  <bpmn:process id="hostel-outpass" name="Hostel Out-Pass Request" isExecutable="true">
+
+    <bpmn:startEvent id="Start_Requested" name="Out-pass requested">
+      <bpmn:outgoing>Flow_Start_Check</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:serviceTask id="Task_Check" name="Check request">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="check-outpass" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Start_Check</bpmn:incoming>
+      <bpmn:outgoing>Flow_Check_Route</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="GW_Route" name="Valid? Nights?">
+      <bpmn:incoming>Flow_Check_Route</bpmn:incoming>
+      <bpmn:outgoing>Flow_Route_Warden</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Route_AutoApprove</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Route_Invalid</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_Warden" name="Warden approval">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="warden-approval-form" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Route_Warden</bpmn:incoming>
+      <bpmn:outgoing>Flow_Warden_Merge</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="GW_Merge" name="">
+      <bpmn:incoming>Flow_Warden_Merge</bpmn:incoming>
+      <bpmn:incoming>Flow_Route_AutoApprove</bpmn:incoming>
+      <bpmn:incoming>Flow_Route_Invalid</bpmn:incoming>
+      <bpmn:outgoing>Flow_Merge_Issue</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_Issue" name="Issue out-pass">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="issue-outpass" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Merge_Issue</bpmn:incoming>
+      <bpmn:outgoing>Flow_Issue_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_Done" name="Out-pass processed">
+      <bpmn:incoming>Flow_Issue_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_Start_Check" sourceRef="Start_Requested" targetRef="Task_Check" />
+    <bpmn:sequenceFlow id="Flow_Check_Route" sourceRef="Task_Check" targetRef="GW_Route" />
+
+    <bpmn:sequenceFlow id="Flow_Route_Warden" name="nights &gt;= 1" sourceRef="GW_Route" targetRef="Task_Warden">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=valid and nights &gt;= 1</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Route_AutoApprove" name="day out (nights = 0)" sourceRef="GW_Route" targetRef="GW_Merge">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=valid and nights = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Route_Invalid" name="invalid dates" sourceRef="GW_Route" targetRef="GW_Merge">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=not(valid)</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_Warden_Merge" sourceRef="Task_Warden" targetRef="GW_Merge" />
+
+    <bpmn:sequenceFlow id="Flow_Merge_Issue" sourceRef="GW_Merge" targetRef="Task_Issue" />
+    <bpmn:sequenceFlow id="Flow_Issue_End" sourceRef="Task_Issue" targetRef="End_Done" />
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="hostel-outpass">
+      <bpmndi:BPMNShape id="Start_Requested_di" bpmnElement="Start_Requested"><dc:Bounds x="152" y="282" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Check_di" bpmnElement="Task_Check"><dc:Bounds x="240" y="260" width="130" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Route_di" bpmnElement="GW_Route" isMarkerVisible="true"><dc:Bounds x="430" y="275" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Warden_di" bpmnElement="Task_Warden"><dc:Bounds x="560" y="260" width="130" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Merge_di" bpmnElement="GW_Merge" isMarkerVisible="true"><dc:Bounds x="800" y="275" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Issue_di" bpmnElement="Task_Issue"><dc:Bounds x="900" y="260" width="130" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Done_di" bpmnElement="End_Done"><dc:Bounds x="1080" y="282" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Check_di" bpmnElement="Flow_Start_Check"><di:waypoint x="188" y="300" /><di:waypoint x="240" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Check_Route_di" bpmnElement="Flow_Check_Route"><di:waypoint x="370" y="300" /><di:waypoint x="430" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Route_Warden_di" bpmnElement="Flow_Route_Warden"><di:waypoint x="480" y="300" /><di:waypoint x="560" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Route_AutoApprove_di" bpmnElement="Flow_Route_AutoApprove"><di:waypoint x="455" y="275" /><di:waypoint x="455" y="140" /><di:waypoint x="825" y="140" /><di:waypoint x="825" y="275" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Route_Invalid_di" bpmnElement="Flow_Route_Invalid"><di:waypoint x="455" y="325" /><di:waypoint x="455" y="460" /><di:waypoint x="825" y="460" /><di:waypoint x="825" y="325" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Warden_Merge_di" bpmnElement="Flow_Warden_Merge"><di:waypoint x="690" y="300" /><di:waypoint x="800" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Merge_Issue_di" bpmnElement="Flow_Merge_Issue"><di:waypoint x="850" y="300" /><di:waypoint x="900" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Issue_End_di" bpmnElement="Flow_Issue_End"><di:waypoint x="1030" y="300" /><di:waypoint x="1080" y="300" /></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
