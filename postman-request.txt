@@ -1,0 +1,21 @@
+POSTMAN REQUEST (Ex 6)
+
+Method : POST
+URL    : http://localhost:8080/v2/process-instances
+Header : Content-Type: application/json
+Auth   : none (if you get 401, use Basic Auth: demo / demo)
+
+Body -> raw -> JSON:
+{
+  "processDefinitionId": "leave-request",
+  "variables": {
+    "employeeName": "Ravi",
+    "days": 3
+  }
+}
+
+Expected: HTTP 200 with "processInstanceKey" in the response (screenshot this).
+
+Viva Q2 test (misspelled ID) - same request but:
+  "processDefinitionId": "leave-reqest"
+Expected: HTTP 404 NOT_FOUND.

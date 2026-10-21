@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  id="Definitions_LeaveRequest"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="Camunda Modeler"
+                  exporterVersion="5.x">
+
+  <bpmn:process id="leave-request" name="Leave Request" isExecutable="true">
+
+    <bpmn:startEvent id="StartEvent_LeaveRequested" name="Leave requested">
+      <bpmn:outgoing>Flow_Start_Approve</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="Task_ApproveLeave" name="Approve Leave">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Start_Approve</bpmn:incoming>
+      <bpmn:outgoing>Flow_Approve_End</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="EndEvent_LeaveProcessed" name="Leave processed">
+      <bpmn:incoming>Flow_Approve_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_Start_Approve" sourceRef="StartEvent_LeaveRequested" targetRef="Task_ApproveLeave" />
+    <bpmn:sequenceFlow id="Flow_Approve_End" sourceRef="Task_ApproveLeave" targetRef="EndEvent_LeaveProcessed" />
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="leave-request">
+      <bpmndi:BPMNShape id="StartEvent_LeaveRequested_di" bpmnElement="StartEvent_LeaveRequested">
+        <dc:Bounds x="182" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="160" y="145" width="80" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ApproveLeave_di" bpmnElement="Task_ApproveLeave">
+        <dc:Bounds x="270" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_LeaveProcessed_di" bpmnElement="EndEvent_LeaveProcessed">
+        <dc:Bounds x="422" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="398" y="145" width="84" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Approve_di" bpmnElement="Flow_Start_Approve">
+        <di:waypoint x="218" y="120" /><di:waypoint x="270" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Approve_End_di" bpmnElement="Flow_Approve_End">
+        <di:waypoint x="370" y="120" /><di:waypoint x="422" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
