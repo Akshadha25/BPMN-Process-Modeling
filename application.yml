@@ -1,0 +1,23 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    # local default = H2 file database; Docker overrides these with PostgreSQL (see ../docker-compose.yml)
+    url: ${DB_URL:jdbc:h2:file:./data/leavedb}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true      # http://localhost:8081/h2-console
+
+camunda:
+  client:
+    mode: self-managed
+    grpc-address: ${CAMUNDA_GRPC_ADDRESS:http://localhost:26500}
+    rest-address: ${CAMUNDA_REST_ADDRESS:http://localhost:8080}
+    # The local Docker cluster runs with unprotectedApi=true, so no credentials are needed.
+    # For a secured cluster, add the authentication settings supported by your Camunda version.

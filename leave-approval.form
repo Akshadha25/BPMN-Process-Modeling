@@ -1,0 +1,26 @@
+{
+  "components": [
+    {
+      "id": "Field_summary",
+      "type": "text",
+      "text": "## Leave request #{{requestId}}\n\n**Employee:** {{employeeEmail}}\n\n**Type:** {{leaveType}} — **{{days}}** working day(s)\n\n**Dates:** {{startDate}} to {{endDate}}"
+    },
+    {
+      "id": "Field_approved",
+      "key": "approved",
+      "type": "checkbox",
+      "label": "Approve this request"
+    },
+    {
+      "id": "Field_comment",
+      "key": "managerComment",
+      "type": "textarea",
+      "label": "Comment"
+    }
+  ],
+  "type": "default",
+  "id": "leave-approval",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "schemaVersion": 17
+}
