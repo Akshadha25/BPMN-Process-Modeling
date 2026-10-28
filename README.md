@@ -145,26 +145,6 @@ curl -u demo:demo -X POST http://localhost:8080/v2/messages/publication \
 
 or with the CLI: `zbctl publish message cancel_booking --correlationKey 9004121457`.
 
-## 6. Observe in Operate
-
-Capture the screenshots listed in [`screenshots/README.md`](screenshots/README.md): the parent instance,
-the child instance reached from the call activity, and the cancellation path. Then add them here:
-
-```
-![Parent instance](screenshots/01-case1-parent-instance.png)
-![Child instance](screenshots/02-case1-child-instance.png)
-![Cancellation path](screenshots/04-case3-cancellation-path.png)
-```
-
-### My observations (fill in after running)
-
-| Check | Variant A (propagate all) | Variant B (mapped only) |
-|---|---|---|
-| Variables visible in child instance | | |
-| Variables added to parent after the call | | |
-| Anything overwritten? | | |
-
-## Publishing to its own GitHub branch
 
 ```bash
 git checkout -b exercise-8-appointment-booking
