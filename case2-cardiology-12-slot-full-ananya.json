@@ -1,0 +1,10 @@
+{
+  "processDefinitionId": "hospital-appointment-booking",
+  "variables": {
+    "patientId": "9004121459",
+    "patientName": "Ananya Sharma",
+    "department": "Cardiology",
+    "preferredSlot": "2026-11-02 11:00",
+    "bookedCount": 12
+  }
+}

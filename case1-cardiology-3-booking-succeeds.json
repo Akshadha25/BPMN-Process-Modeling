@@ -1,0 +1,22 @@
+
+{
+  "processDefinitionId": "hospital-appointment-booking",
+  "variables": {
+    "patientId": "9004121457",
+    "patientName": "Asha Kumar",
+    "department": "Cardiology",
+    "preferredSlot": "2026-11-02 10:30",
+    "bookedCount": 3
+  }
+}
+{
+  "processDefinitionId": "hospital-appointment-booking",
+  "processDefinitionVersion": 1,
+  "variables": {
+    "patientId": "9004121458",
+    "patientName": "Ravi Menon",
+    "department": "Cardiology",
+    "preferredSlot": "2026-11-02 11:00",
+    "bookedCount": 3
+  }
+

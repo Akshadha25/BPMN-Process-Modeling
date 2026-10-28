@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_SendNotification" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.49.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:process id="send-notification" name="Send Notification" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_Notify" name="Notification requested">
+      <bpmn:outgoing>Flow_N1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_SendTelegram" name="Send Telegram message" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="https://api.telegram.org/bot{{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage" target="url" />
+          <zeebe:input source="={&#34;Content-Type&#34;: &#34;application/json&#34;}" target="headers" />
+          <zeebe:input source="=10" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="=1" target="readTimeoutInSeconds" />
+          <zeebe:input source="={chat_id: recipientId, text: messageText}" target="body" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" value="telegramResponse" />
+          <zeebe:header key="resultExpression" value="={notificationStatus: &#34;SENT&#34;, telegramMessageId: response.body.result.message_id}" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_N1</bpmn:incoming>
+      <bpmn:outgoing>Flow_N2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Notified" name="Notification sent">
+      <bpmn:incoming>Flow_N2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_N1" sourceRef="StartEvent_Notify" targetRef="Task_SendTelegram" />
+    <bpmn:sequenceFlow id="Flow_N2" sourceRef="Task_SendTelegram" targetRef="End_Notified" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="send-notification">
+      <bpmndi:BPMNShape id="StartEvent_Notify_di" bpmnElement="StartEvent_Notify">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="125" y="145" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendTelegram_di" bpmnElement="Task_SendTelegram">
+        <dc:Bounds x="250" y="80" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Notified_di" bpmnElement="End_Notified">
+        <dc:Bounds x="460" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="437" y="145" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_N1_di" bpmnElement="Flow_N1">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="250" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_N2_di" bpmnElement="Flow_N2">
+        <di:waypoint x="390" y="120" />
+        <di:waypoint x="460" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
