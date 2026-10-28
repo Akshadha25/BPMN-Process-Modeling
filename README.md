@@ -4,9 +4,6 @@ A hospital appointment-booking process built from a **parent process**, a **reus
 (`send-notification`) called through **call activities**, a **DMN decision** (`slot_decision`) and an
 **event subprocess** for cancellation at any time.
 
-![Parent process](diagrams/parent_process.png)
-![Child process](diagrams/send_notification.png)
-
 ## Repository structure
 
 ```
